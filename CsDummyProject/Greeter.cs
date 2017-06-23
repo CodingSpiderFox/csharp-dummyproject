@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CsDummyProject
 {
-    class Program
+    public class Greeter
     {
-        static void Main(string[] args)
+        public static String GetGreeting()
         {
-            Console.WriteLine(Greeter.GetGreeting());
-            Thread.Sleep(10000);
+            return "Hello World";
         }
     }
 }
