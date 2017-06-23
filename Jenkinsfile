@@ -1,3 +1,8 @@
+def getStashBinName() {
+    return getCurrentRunStashPrefix()+"-bin"
+}
+
+
 def build (String solutionFilePath) {
     stage("Building") {
         def compilerTool;
@@ -6,27 +11,34 @@ def build (String solutionFilePath) {
         
         println("Building MSBuild 14 Config:Release|AnyCPU")
         bat "${compilerTool} ${solutionFilePath} /p:Configuration=Release /p:Platform=\"Any CPU\""
+        
+        println("Stashing built binaries (stash: "+getStashBinName()+")")
+        stash name: getStashBinName(), includes : "bin/**"
     }
+}
+
+def getCurrentRunStashPrefix() {
+    return env.JOB_NAME + env.BUILD_ID
 }
 
 def NUnit() {
     return NUnit("2.6.4")
 }
 
-def NUnit(String version ){
+def NUnit(String version){
     def toolString = tool("NUnit-${version}")
     return toolString + "/NUnit-${version}/bin/nunit-console.exe"
 }
 
-def buildTestItemsString(List<String> testItemFileNames) {
-    String result;
+def buildTestItemsString(testItemFileNames) {
+    String result = "";
     for(testItemFileName in testItemFileNames) {
         result += testItemFileName + " ";
     }
     return result;
 }
 
-def test(List<String> testItemFileNames) {
+def test(testItemFileNames) {
     node("net-4.5")
     {
         stage("Testing") {
@@ -34,7 +46,7 @@ def test(List<String> testItemFileNames) {
                 def testTool = NUnit() //TODO make an option for NUnit version
                 def testItems = buildTestItemsString(testItemFileNames)
                 def testArgs = "${testItems} /labels /framework:net-4.5 /xml=testResults-CI-${env.BUILD_ID}.xml"
-                
+                unstash getStashBinName()
                 bat "${testTool} ${testArgs}"
             }
         }
@@ -42,7 +54,7 @@ def test(List<String> testItemFileNames) {
 }
 
 
-def installDeps(String solutionFilePath) {
+def installDeps(String solutionFilePath, nuget) {
     nuget.restore(solutionFilePath)
 }
 
@@ -55,10 +67,10 @@ node("vc14") {
     
     def nuget = load("nuget.groovy")
     
-    installDeps(solutionFilePath)
+    installDeps(solutionFilePath, nuget)
     
     build(solutionFilePath)
     
-    def testItemFileNames = new ArrayList<String>() {"CsDummyProjectTest.dll"}
+    def testItemFileNames = ["CsDummyProjectTest.dll"]
     test(testItemFileNames)
 }
