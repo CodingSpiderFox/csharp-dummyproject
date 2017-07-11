@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>CsDummyProject</id>
+    <version>0.1.0</version>
+    <authors>Maintainer.A@tld.com</authors>
+    <owners>Maintainer.A@tld.com</owners>
+    <projectUrl>URL</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+        blah
+    </description>
+    <summary>blah</summary>
+    <releaseNotes>blah</releaseNotes>
+    <tags></tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+    <files>
+        <file src="**\bin\Release\*.dll" target="lib\net40" />
+        <file src="**\bin\Release\*.xml" target="lib\net40" />
+        <file src="**\bin\Release\*.pdb" target="lib\net40" />
+        <file src="**\bin\Release\*.exe" target="lib\net40" />
+        <file src="**\*.cs" target="src" />
+    </files>
+   </files>
+</package>
